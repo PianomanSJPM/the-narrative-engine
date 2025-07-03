@@ -1,136 +1,95 @@
-# 🎲 SoloHeart Game Engine
+This work includes material from the System Reference Document 5.1 and is licensed under the Creative Commons Attribution 4.0 International License.
 
-> **Transform solo tabletop gaming with AI-powered storytelling that adapts to your choices and creates truly personalized adventures.**
+# The Narrative Engine
 
-![Demo Status](https://img.shields.io/badge/status-Demo%20Stage%20%E2%80%93%20Actively%20Developing-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
-![Python](https://img.shields.io/badge/python-3.9+-blue)
+A domain-agnostic storytelling framework with layered memory, context modeling, and narrative continuity management.
 
-![Demo Screenshot](demo_screenshot.txt)
+## Overview
 
-## Project Summary
+The Narrative Engine is a sophisticated AI-powered storytelling system designed to create immersive, emotionally consistent narratives across multiple domains. Unlike traditional generative AI systems, The Narrative Engine emphasizes interpretive storytelling where the user is a co-author, memory is treated as sacred, and emotional realism shapes character behavior.
 
-This is a proof-of-concept demo for the **Narrative Engine**: an immersive, LLM-powered solo DnD 5E experience. The system enables a single player to create a character using natural language and play through a campaign with an AI Dungeon Master, all in a clean, SRD 5.1-compliant, and legally safe environment.
+## Core Features
 
-## How It Works
+- **Layered Memory System**: Multi-tiered memory architecture with semantic, episodic, and procedural layers
+- **Emotional Context Tracking**: NPCs remember and respond to emotional contexts
+- **Contextual Continuity**: Stories evolve based on established narrative threads and character relationships
+- **Multi-Domain Support**: Works for gaming, therapy, education, and creative fiction
+- **World State Simulation**: Persistent world state that evolves consistently
 
+## Installation
+
+```bash
+# Install from the narrative_engine directory
+cd narrative_engine
+pip install -e .
+
+# Or install with optional dependencies
+pip install -e .[vector,web,cache]
+
+# For development
+pip install -e .[dev]
 ```
-Player Input → LLM Processing → Narrative Response → Campaign State Update
-     ↓              ↓                ↓                    ↓
-Natural Language → Context Analysis → Story Generation → Persistent Save
-     ↓              ↓                ↓                    ↓
-Character Creation → Memory Systems → Emotional Tracking → Campaign Progression
-```
-
-### Core Flow
-1. **Start Screen** → Choose to begin new campaign or continue existing
-2. **Vibe Code Creation** → Natural conversation with AI to build your character
-3. **Narrative Gameplay** → Immersive storytelling with persistent campaign state
-4. **Save & Continue** → Seamless persistence across sessions
-
-## Key Features
-
-- **🎯 Start Screen**: Begin a new campaign, continue, or delete existing campaigns
-- **💬 Vibe Code Character Creation**: Create a character through natural conversation with the LLM (GPT-4o-mini or compatible)
-- **📋 SRD-Compliant Character Data**: All character data is saved in a structured, open format
-- **📖 Immersive Narrative Gameplay**: Seamless transition into a pure narrative interface, with the LLM acting as DM
-- **💾 Persistent Campaigns**: Save, load, and delete campaigns with persistent storage
-- **📱 Mobile-Responsive UI**: Clean, thematic, and immersive design
 
 ## Quick Start
 
-### Prerequisites
-- Python 3.9+
-- OpenAI API key
+```python
+from narrative_engine.core.narrative_engine import NarrativeEngine
+from narrative_engine.memory.layered_memory import LayeredMemorySystem
 
-### Installation
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/PianomanSJPM/solo-rp-game-demo.git
-   cd solo-rp-game-demo/solo_heart
-   ```
+# Initialize the engine
+engine = NarrativeEngine(
+    campaign_id="my_story",
+    domain="fiction"  # or "therapy", "education", "gaming"
+)
 
-2. **Install dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
+# Create a memory system
+memory = LayeredMemorySystem(campaign_id="my_story")
 
-3. **Set up your OpenAI API key**:
-   ```bash
-   cp .env.template .env
-   # Add your OpenAI API key to .env
-   ```
+# Store a memory with emotional context
+memory.store_memory(
+    content="The protagonist helped a wounded traveler",
+    memory_type="episodic",
+    emotional_context={
+        "valence": 0.8,  # Positive
+        "arousal": 0.6,  # Moderate excitement
+        "dominance": 0.7  # Protagonist felt in control
+    },
+    tags=["helping", "traveler", "kindness"]
+)
 
-### Running the Demo
-1. **Start the start screen interface** (port 5001):
-   ```bash
-   python start_screen_interface.py
-   ```
+# Generate narrative content
+response = engine.generate_narration(
+    situation="The protagonist enters a village",
+    context="Previous kindness remembered by villagers"
+)
 
-2. **In a new terminal, start the narrative interface** (port 5002):
-   ```bash
-   python narrative_focused_interface.py
-   ```
+print(response)
+```
 
-3. **Open your browser**:
-   - Start screen: [http://localhost:5001](http://localhost:5001)
-   - Narrative gameplay: [http://localhost:5002](http://localhost:5002)
+## Supported Environments
 
-## Demo Walkthrough
+- **Creative Writing**: Interactive storytelling with persistent character development
+- **Therapeutic Journaling**: Emotional processing with memory continuity
+- **Educational Simulations**: Historical scenarios with adaptive responses
+- **Gaming**: AI-driven narrative experiences with emotional depth
 
-### 1. Start a New Campaign
-- Click "Start New Campaign" and follow the prompts
-- Choose your preferred character creation method
+## Dependencies
 
-### 2. Vibe Code Character Creation
-- Select the natural language option
-- Converse with the AI to describe your character concept
-- The LLM will ask clarifying questions and build your character sheet
+### Required
+- `openai>=1.0.0` - OpenAI API integration
+- `numpy>=1.21.0` - Numerical computations
+- `pydantic>=2.0.0` - Data validation
+- `python-dotenv>=0.19.0` - Environment management
 
-### 3. Immersive Gameplay
-- After character creation, transition directly into narrative gameplay
-- Respond naturally to the AI DM's storytelling
-- Your choices and character development are tracked and remembered
-
-### 4. Campaign Management
-- Return to the start screen to continue or delete campaigns
-- All progress is automatically saved and persistent
-
-## Screenshots
-
-![Demo Screenshot](demo_screenshot.txt)
-
-*Screenshot showing the start screen, character creation flow, and narrative gameplay interface*
-
-> _Replace with actual screenshots of the start screen, character creation, and narrative interface_
-
-## Technology Stack
-
-- **Backend**: Python, Flask, OpenAI API
-- **Frontend**: HTML5, CSS3, JavaScript
-- **Character System**: SRD 5.1-compliant JSON schema
-- **AI Integration**: GPT-4o-mini for natural language processing
-- **Storage**: Local file-based persistence
-
-## Contributing
-
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to get started.
-
-## Documentation
-
-- [Investor Documentation](investor_docs/) - Project overview, features, and future vision
-- [Attribution](solo_heart/ATTRIBUTION.md) - Legal compliance and attributions
-
-## Attribution
-
-This project uses content from the Systems Reference Document 5.1 (SRD 5.1) by Wizards of the Coast LLC, available under the Creative Commons Attribution 4.0 International License (CC BY 4.0).
-
-- SRD 5.1: https://dnd.wizards.com/resources/systems-reference-document
-- License: https://creativecommons.org/licenses/by/4.0/
-
-This project uses the OpenAI API for natural language processing and LLM-driven gameplay.
-- https://openai.com/
+### Optional
+- `faiss-cpu>=1.7.0` - Vector similarity search (for enhanced memory)
+- `flask>=2.0.0` - Web interface support
+- `redis>=4.0.0` - Caching and session storage
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License - See LICENSE file for details.
+
+## Contributing
+
+This is an alpha release. For questions or contributions, please refer to the main project documentation.

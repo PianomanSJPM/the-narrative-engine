@@ -1,229 +1,128 @@
 #!/usr/bin/env python3
 """
 Setup script for The Narrative Engine
-====================================
-
-Installs dependencies and sets up the environment for The Narrative Engine.
+A modular, domain-agnostic AI-driven narrative architecture
 """
 
+from setuptools import setup, find_packages
 import os
-import sys
-import subprocess
-import shutil
-from pathlib import Path
 
-def check_python_version():
-    """Check if Python version is compatible."""
-    if sys.version_info < (3, 8):
-        print("❌ Python 3.8 or higher is required")
-        print(f"Current version: {sys.version}")
-        return False
-    print(f"✅ Python version: {sys.version.split()[0]}")
-    return True
+# Read the README file for long description
+def read_readme():
+    readme_path = os.path.join(os.path.dirname(__file__), 'README.md')
+    if os.path.exists(readme_path):
+        with open(readme_path, 'r', encoding='utf-8') as f:
+            return f.read()
+    return "The Narrative Engine - A modular, domain-agnostic AI-driven narrative architecture"
 
-def create_virtual_environment():
-    """Create a virtual environment if it doesn't exist."""
-    venv_path = Path("venv")
-    
-    if venv_path.exists():
-        print("✅ Virtual environment already exists")
-        return True
-    
-    print("📦 Creating virtual environment...")
-    try:
-        subprocess.run([sys.executable, "-m", "venv", "venv"], check=True)
-        print("✅ Virtual environment created successfully")
-        return True
-    except subprocess.CalledProcessError as e:
-        print(f"❌ Failed to create virtual environment: {e}")
-        return False
+# Read requirements from requirements.txt if it exists
+def read_requirements():
+    requirements_path = os.path.join(os.path.dirname(__file__), 'requirements.txt')
+    if os.path.exists(requirements_path):
+        with open(requirements_path, 'r', encoding='utf-8') as f:
+            return [line.strip() for line in f if line.strip() and not line.startswith('#')]
+    return []
 
-def install_dependencies():
-    """Install required dependencies."""
-    print("📦 Installing dependencies...")
-    
-    # Determine the pip command based on the platform
-    if os.name == 'nt':  # Windows
-        pip_cmd = "venv\\Scripts\\pip"
-    else:  # Unix/Linux/macOS
-        pip_cmd = "venv/bin/pip"
-    
-    try:
-        # Upgrade pip first
-        subprocess.run([pip_cmd, "install", "--upgrade", "pip"], check=True)
-        
-        # Install requirements
-        subprocess.run([pip_cmd, "install", "-r", "requirements.txt"], check=True)
-        print("✅ Dependencies installed successfully")
-        return True
-    except subprocess.CalledProcessError as e:
-        print(f"❌ Failed to install dependencies: {e}")
-        return False
-
-def create_directories():
-    """Create necessary directories."""
-    directories = [
-        "data",
-        "exports",
-        "logs",
-        "config"
-    ]
-    
-    for directory in directories:
-        Path(directory).mkdir(exist_ok=True)
-    
-    print("✅ Directories created")
-
-def create_config_file():
-    """Create a default configuration file."""
-    config_path = Path("config/config.json")
-    
-    if config_path.exists():
-        print("✅ Configuration file already exists")
-        return True
-    
-    config_content = {
-        "memory": {
-            "short_term_max": 50,
-            "mid_term_max": 1000,
-            "long_term_max": 10000,
-            "forget_threshold": 0.1
-        },
-        "analysis": {
-            "cache_enabled": True,
-            "cache_ttl": 3600
-        },
-        "logging": {
-            "level": "INFO",
-            "file": "logs/narrative_engine.log"
-        }
-    }
-    
-    try:
-        import json
-        config_path.parent.mkdir(exist_ok=True)
-        with open(config_path, 'w') as f:
-            json.dump(config_content, f, indent=2)
-        print("✅ Configuration file created")
-        return True
-    except Exception as e:
-        print(f"❌ Failed to create configuration file: {e}")
-        return False
-
-def run_tests():
-    """Run basic tests to verify installation."""
-    print("🧪 Running tests...")
-    
-    # Determine the python command based on the platform
-    if os.name == 'nt':  # Windows
-        python_cmd = "venv\\Scripts\\python"
-    else:  # Unix/Linux/macOS
-        python_cmd = "venv/bin/python"
-    
-    try:
-        # Run the test file
-        result = subprocess.run([python_cmd, "tests/test_narrative_engine.py"], 
-                              capture_output=True, text=True)
-        
-        if result.returncode == 0:
-            print("✅ Tests passed")
-            return True
-        else:
-            print("⚠️  Tests had issues:")
-            print(result.stdout)
-            print(result.stderr)
-            return False
-    except subprocess.CalledProcessError as e:
-        print(f"❌ Failed to run tests: {e}")
-        return False
-
-def run_demo():
-    """Run the demo to showcase functionality."""
-    print("🚀 Running demo...")
-    
-    # Determine the python command based on the platform
-    if os.name == 'nt':  # Windows
-        python_cmd = "venv\\Scripts\\python"
-    else:  # Unix/Linux/macOS
-        python_cmd = "venv/bin/python"
-    
-    try:
-        subprocess.run([python_cmd, "examples/demo.py"], check=True)
-        print("✅ Demo completed successfully")
-        return True
-    except subprocess.CalledProcessError as e:
-        print(f"❌ Demo failed: {e}")
-        return False
-
-def print_activation_instructions():
-    """Print instructions for activating the virtual environment."""
-    print("\n" + "="*60)
-    print("🎉 SETUP COMPLETE!")
-    print("="*60)
-    
-    if os.name == 'nt':  # Windows
-        print("\nTo activate the virtual environment:")
-        print("  venv\\Scripts\\activate")
-    else:  # Unix/Linux/macOS
-        print("\nTo activate the virtual environment:")
-        print("  source venv/bin/activate")
-    
-    print("\nTo run the demo:")
-    print("  python examples/demo.py")
-    
-    print("\nTo run tests:")
-    print("  python tests/test_narrative_engine.py")
-    
-    print("\nTo start using The Narrative Engine:")
-    print("  python")
-    print("  >>> from core.narrative_engine import NarrativeEngine")
-    print("  >>> engine = NarrativeEngine()")
-    print("  >>> narrative = engine.create_narrative('My Story', 'A test narrative', 'gaming')")
-    
-    print("\n📚 Documentation:")
-    print("  - README.md: Overview and quick start")
-    print("  - docs/API.md: Complete API documentation")
-    print("  - examples/demo.py: Working examples")
-    
-    print("\n🔧 Configuration:")
-    print("  - Edit config/config.json to customize settings")
-    
-    print("\n" + "="*60)
-
-def main():
-    """Main setup function."""
-    print("🚀 The Narrative Engine Setup")
-    print("="*40)
-    
-    # Check Python version
-    if not check_python_version():
-        sys.exit(1)
-    
-    # Create virtual environment
-    if not create_virtual_environment():
-        sys.exit(1)
-    
-    # Install dependencies
-    if not install_dependencies():
-        sys.exit(1)
-    
-    # Create directories
-    create_directories()
-    
-    # Create configuration
-    if not create_config_file():
-        print("⚠️  Continuing without configuration file")
-    
-    # Run tests
-    if not run_tests():
-        print("⚠️  Tests failed, but continuing with setup")
-    
-    # Run demo
-    if not run_demo():
-        print("⚠️  Demo failed, but setup is complete")
-    
-    # Print instructions
-    print_activation_instructions()
-
-if __name__ == "__main__":
-    main() 
+setup(
+    name="narrative-engine",
+    version="0.1.0",
+    author="Stephen John Miller",
+    author_email="",  # Add if available
+    description="A domain-agnostic storytelling framework with layered memory, context modeling, and narrative continuity management.",
+    long_description=read_readme(),
+    long_description_content_type="text/markdown",
+    url="",  # Add repository URL if available
+    packages=find_packages(),
+    classifiers=[
+        "Development Status :: 3 - Alpha",
+        "Intended Audience :: Developers",
+        "Intended Audience :: Education",
+        "Intended Audience :: Science/Research",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
+        "Topic :: Artistic Software",
+        "Topic :: Games/Entertainment",
+        "Topic :: Scientific/Engineering :: Artificial Intelligence",
+        "Topic :: Software Development :: Libraries :: Python Modules",
+        "Topic :: Text Processing :: Linguistic",
+    ],
+    python_requires=">=3.8",
+    install_requires=[
+        # "openai>=1.0.0",  # Removed - using Ollama instead
+        "numpy>=1.21.0",
+        "pydantic>=2.0.0",
+        "python-dotenv>=0.19.0",
+        "requests>=2.25.0",
+        "typing-extensions>=4.0.0",
+        "dataclasses-json>=0.5.0",
+        "uuid>=1.30",
+    ],
+    extras_require={
+        "vector": [
+            "faiss-cpu>=1.7.0",
+            "sentence-transformers>=2.0.0",
+        ],
+        "web": [
+            "flask>=2.0.0",
+            "flask-cors>=3.0.0",
+        ],
+        "cache": [
+            "redis>=4.0.0",
+        ],
+        "dev": [
+            "pytest>=6.0.0",
+            "pytest-cov>=2.10.0",
+            "black>=21.0.0",
+            "flake8>=3.8.0",
+            "mypy>=0.900",
+        ],
+        "all": [
+            "faiss-cpu>=1.7.0",
+            "sentence-transformers>=2.0.0",
+            "flask>=2.0.0",
+            "flask-cors>=3.0.0",
+            "redis>=4.0.0",
+            "pytest>=6.0.0",
+            "pytest-cov>=2.10.0",
+            "black>=21.0.0",
+            "flake8>=3.8.0",
+            "mypy>=0.900",
+        ],
+    },
+    include_package_data=True,
+    package_data={
+        "narrative_engine": [
+            "docs/*.md",
+            "memory/requirements-vector.txt",
+        ],
+    },
+    entry_points={
+        "console_scripts": [
+            "narrative-engine=narrative_engine.core.narrative_engine:main",
+        ],
+    },
+    keywords=[
+        "narrative",
+        "storytelling",
+        "ai",
+        "memory",
+        "emotional",
+        "interactive",
+        "gaming",
+        "therapy",
+        "education",
+        "fiction",
+    ],
+    project_urls={
+        "Documentation": "",  # Add if available
+        "Source": "",  # Add if available
+        "Tracker": "",  # Add if available
+    },
+)
